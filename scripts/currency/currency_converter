@@ -1,0 +1,82 @@
+server {
+	
+ #           listen [::]:443 ssl http2 ipv6only=on; 
+#    listen 443 ssl http2; 
+	server_name jiasheng.me www.jiasheng.me;
+
+
+	charset utf-8;
+
+
+    # Always serve index.html for any request
+
+	location /currency {
+
+		alias  /home/ubuntu/currency-converter-pwa2/dist/;
+		index index.html;
+	}
+#	location ~ (service-worker.js)$ {
+
+
+
+	  # ...
+
+#	  add_header Last-Modified $date_gmt;
+
+#	  add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
+#
+#	  if_modified_since off;
+#
+#	  expires off;
+
+#	  etag off;
+#	}
+    listen [::]:443 ssl http2 ipv6only=on; 
+    listen 443 ssl http2; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/jiasheng.me/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/jiasheng.me/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+    location /api/ {
+        proxy_pass http://localhost:3000/;
+#        proxy_redirect off;
+        proxy_set_header Host $host:$server_port;
+#            proxy_http_version 1.1;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $http_connection;
+proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header SSL_PROTOCOL $ssl_protocol;
+     if ($request_method = 'POST') {
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+        add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range';
+     }
+     if ($request_method = 'GET') {
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+        add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range';
+     }
+   }
+
+}
+server {
+    if ($host = www.jiasheng.me) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    if ($host = jiasheng.me) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+	listen 80;
+
+	server_name jiasheng.me www.jiasheng.me;
+
+    return 404; # managed by Certbot
+}
+
